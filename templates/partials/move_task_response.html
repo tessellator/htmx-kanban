@@ -1,0 +1,14 @@
+{% if from_column is defined %}
+<hx-partial hx-swap="delete" id="task--{{task.id}}--{{from_column}}"></hx-partial>
+{% endif %}
+
+
+{% if previous_task is not none %}
+<hx-partial hx-swap="afterend" hx-target="#task--{{previous_task}}--{{to_column}}">
+    <li id="task--{{task.id}}--{{to_column}}" draggable="true" class="outline text-center mx-2 my-4">{{task.title}}</li>
+</hx-partial>
+{% else %}
+<hx-partial hx-swap="prepend" hx-target="#tasks--{{to_column}}">
+    <li id="task--{{task.id}}--{{to_column}}" draggable="true" class="outline text-center mx-2 my-4">{{task.title}}</li>
+</hx-partial>
+{% endif %}

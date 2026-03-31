@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@next"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+</head>
+<body>
+<h1 class="text-2xl text-center mb-8">Board</h1>
+
+<section class="p-8">
+    <form hx-post="/tasks" hx-on:htmx:after:request="this.reset()">
+        <label>New Task <input type="text" name="title" class="input"></label>
+        <button type="submit" class="btn">Add</button>
+    </form>
+</section>
+
+<section>
+    <div class="flex flex-row justify-around"
+         id="board"
+         _="on dragstart call event.dataTransfer.setData('text/plain',target.id.split('--')[1])"
+    >
+        {% for column in board.columns %}
+        <div class="outline p-4 mx-4 w-64"
+             id="column--{{ column.name }}"
+             _="on dragover or dragenter halt the event
+                on drop set task_id to event.dataTransfer.getData('text/plain')
+                    then set column_id to event.currentTarget.id.replace('column--', '')
+                    then js(task_id, column_id) htmx.ajax('post', '/task-status', {values: {task_id, column_id}})"
+        >
+            <h2 class="text-xl text-center">{{ column.name }}</h2>
+            <ol id="tasks--{{ column.name }}">
+                {% for task in column.tasks %}
+                <li id="task--{{task.id}}--{{ column.name }}"
+                    draggable="true"
+                    class="outline text-center mx-2 my-4">
+                    {{ task.title }}
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+</body>
+</html>
